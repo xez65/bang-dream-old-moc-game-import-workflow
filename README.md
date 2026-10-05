@@ -40,6 +40,37 @@
 3. 遇到缺件、错层、白块、UV、动作接线、ZIP 或浏览器问题时，查 `docs/moc2-to-moc3-pinhao-lessons-20261005.md` 的对应故障分支。
 4. 需要复用脚本或复跑测试时，查 `docs/tools-README.md`，先核对脚本当前接口和输入输出，不按文件名推断通用性。
 
+## 拿到工作流包后的配置
+
+这是文档、案例和工具索引包，不是可直接打开的 Unity 工程。包内不包含 Cubism SDK、第三方模型、贴图、Unity 工程、`.env` 或密钥。其他用户使用时，应为自己的角色建立新配置和新输出目录：
+
+```text
+角色标识: <角色名>
+源归档: <源 zip 或目录>
+入口清单: <全部 model.json 或其他入口>
+暂存根目录: <ASCII 路径，并保留原路径映射>
+输出根目录: <本轮新的日期目录>
+目标 MOC3 reference: <实际版本>
+Unity: 6000.5.8f1（案例基线；不同版本要重新验证）
+Cubism SDK/Core: <版本或 SHA-256>
+转换器/JDK/Python/Node: <实际版本和用途>
+目标验收: <动作、表情、姿势、物理、截图范围>
+```
+
+配置时不要复制生产者机器的绝对路径或本地 `file:` Package Manager 缓存。Unity 依赖应由接收者自己的 Package Manager 和授权 SDK 目录提供；需要 Umamo/Gradle 时按本轮实际工具使用 JDK 21 基线。中文归档路径可以映射到 ASCII 暂存目录，但必须逐项保存 `archive_path → staged_path` 映射。
+
+## 其他用户拿到 runtime ZIP 后的使用步骤
+
+1. 先阅读 ZIP 内的 `README.txt`、`MANIFEST.sha256` 和 `<角色>.model3.json`，核对入口、资源哈希和候选状态。
+2. 安装与记录一致的 Unity Editor 和 Cubism SDK for Unity。流萤猫案例使用 Unity `6000.5.8f1`；换版本或 SDK 后不能沿用生产者的运行结论。
+3. 创建隔离 Unity 工程，通过 Package Manager 安装自己的依赖，把运行资源复制到 `Assets/Live2D/Models/<角色名>/`，保持 model3、moc3、贴图、motions、expressions、physics 和 display info 的相对路径。
+4. 等待 Cubism importer 生成模型资产、Prefab、动作、表情和 fade 列表；把 README、manifest、证据页和报告放在工程外或 `Documentation/`。
+5. 将生成的角色 Prefab 放入场景，配置相机和背景，检查 `CubismModel`、Renderer 纹理、参数数组、MotionController、表情控制器和 Physics 绑定。运行时代码动态加组件后，按 SDK 要求执行 Refresh。
+6. 先做一个动作、一个表情、一个默认姿势和 physics on/off smoke test，再按 G5/G6 做全量 PlayMode 验收，保存 Unity、SDK、工程依赖和实际加载资源的版本及哈希。
+7. 单独记录包完整性、Unity 导入、控制器接线、动作表情播放、物理响应、视觉对照和用户认可。`unity_verified` 只表示生产者环境下的证据，不能替代接收者自己的 Unity 验证。
+
+遇到缺件、错层、白块、UV、参数别名、动作裁剪、fade 空槽、ZIP 回读或证据页面问题时，按主文档的 G0–G8 阶段恢复；旧候选和旧报告保持冻结，新尝试使用新的日期目录和后继工具。
+
 ## 最低证据要求
 
 每轮迁移至少应保存：
